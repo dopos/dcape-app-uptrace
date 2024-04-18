@@ -4,9 +4,6 @@
 services:
   # This service will extend code from dcape
   app:
-#    ports:
-#      - '14317:14317'
-#      - '14318:14318'
     labels:
       - traefik.http.services.${APP_TAG}.loadbalancer.server.port=14318
       - traefik.http.routers.${APP_TAG}.service=${APP_TAG}
@@ -32,10 +29,6 @@ services:
       - OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=BASE2_EXPONENTIAL_BUCKET_HISTOGRAM
       - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=DELTA
     volumes:
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/ssl/certs:/etc/ssl/certs:ro
-      - ./var/ssl:/config/ssl
       - ./etc/uptrace.yml:/etc/uptrace/uptrace.yml
     depends_on:
       - ch_db
@@ -126,8 +119,6 @@ services:
     image: axllent/mailpit:v1.16.0
     hostname: mailpit
     restart: always
-    ports:
-      - 8025:8025
     labels:
       - traefik.enable=true
       - dcape.traefik.tag=${DCAPE_TAG}
