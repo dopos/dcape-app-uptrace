@@ -4,6 +4,148 @@
 services:
   # This service will extend code from dcape
   app:
+#    ports:
+#      - '14317:14317'
+#      - '14318:14318'
+    labels:
+      - traefik.http.services.${APP_TAG}.loadbalancer.server.port=14318
+      - traefik.http.routers.${APP_TAG}.service=${APP_TAG}
+
+      - traefik.http.routers.${APP_TAG}-grpc.service=${APP_TAG}-grpc
+      - traefik.http.routers.${APP_TAG}-grpc.rule=Host(`grpc.${APP_SITE:?Must be set}`)
+      - traefik.http.routers.${APP_TAG}-grpc.tls=${USE_TLS}
+      - traefik.http.routers.${APP_TAG}-grpc.tls.certresolver=default
+      - traefik.http.services.${APP_TAG}-grpc.loadbalancer.server.port=14317
+      - traefik.http.services.${APP_TAG}-grpc.loadbalancer.server.scheme=h2c
     environment:
-      # Some var to keep YML struct
-      - DEBUG=yes
+      - APP_SITE
+      - USER_EMAIL
+      - USER_PASS
+      - PGDATABASE
+      - PGUSER
+      - PGPASSWORD
+      - UPTRACE_PROJECT_KEY1
+      - UPTRACE_PROJECT_KEY2
+      - UPTRACE_SECRET_KEY
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otelcol:4318
+      - OTEL_EXPORTER_OTLP_COMPRESSION=gzip
+      - OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=BASE2_EXPONENTIAL_BUCKET_HISTOGRAM
+      - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=DELTA
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/ssl/certs:/etc/ssl/certs:ro
+      - ./var/ssl:/config/ssl
+      - ./etc/uptrace.yml:/etc/uptrace/uptrace.yml
+    depends_on:
+      - ch_db
+      - otelcol
+      - mailpit
+
+  ch_db:
+    image: clickhouse/clickhouse-server:23.7-alpine
+    restart: always
+#    ports:
+#      - '8123:8123'
+#      - '9000:9000'
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./var/ch_data:/var/lib/clickhouse
+      - ./etc/clickhouse/clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro
+      - ./etc/clickhouse/clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro
+#      - ${DCAPE_ROOT}/var/ch-uptrace:/var/lib/clickhouse
+    environment:
+      CLICKHOUSE_DB: uptrace
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '-q', 'localhost:8123/ping']
+      interval: 1s
+      timeout: 1s
+      retries: 30
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+  otelcol:
+    image: otel/opentelemetry-collector-contrib:0.88.0
+    restart: on-failure
+    labels:
+      - traefik.enable=true
+      - dcape.traefik.tag=${DCAPE_TAG}
+      - traefik.http.routers.${APP_TAG}-otc.rule=Host(`otc.${APP_SITE:?Must be set}`)
+      - traefik.http.routers.${APP_TAG}-otc.tls=${USE_TLS}
+      - traefik.http.routers.${APP_TAG}-otc.tls.certresolver=default
+      - traefik.http.routers.${APP_TAG}-otc.service=${APP_TAG}-otc
+      - traefik.http.services.${APP_TAG}-otc.loadbalancer.server.port=4318
+
+      - traefik.http.routers.${APP_TAG}-grpcotc.rule=Host(`grpc.otc.${APP_SITE:?Must be set}`)
+      - traefik.http.routers.${APP_TAG}-grpcotc.tls=${USE_TLS}
+      - traefik.http.routers.${APP_TAG}-grpcotc.tls.certresolver=default
+      - traefik.http.routers.${APP_TAG}-grpcotc.service=${APP_TAG}-grpcotc
+      - traefik.http.services.${APP_TAG}-grpcotc.loadbalancer.server.port=4317
+      - traefik.http.services.${APP_TAG}-grpcotc.loadbalancer.server.scheme=h2c
+    environment:
+      - APP_SITE
+      - PGDATABASE
+      - PGUSER
+      - PGPASSWORD
+      - UPTRACE_PROJECT_KEY2
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/ssl/certs:/etc/ssl/certs:ro
+#      - /:/hostfs:ro
+#      - ./var/ssl/ca.crt.pem:/etc/ssl/certs/ca-certificates.crt
+      - ./etc/otel-collector.yaml:/etc/otelcol-contrib/config.yaml
+
+  grafana:
+    image: ${GF_IMAGE}:${GF_IMAGE_VER}
+    restart: always
+    labels:
+      - traefik.enable=true
+      - dcape.traefik.tag=${DCAPE_TAG}
+      - traefik.http.routers.${APP_TAG}-graf.rule=Host(`graf.${APP_SITE:?Must be set}`)
+      - traefik.http.routers.${APP_TAG}-graf.tls=${USE_TLS}
+      - traefik.http.routers.${APP_TAG}-graf.tls.certresolver=default
+      - traefik.http.services.${APP_TAG}-graf.loadbalancer.server.port=3000
+    environment:
+      - GF_SECURITY_ADMIN_USER=${USER_EMAIL}
+      - GF_SECURITY_ADMIN_PASSWORD=${USER_PASS}
+      - GF_INSTALL_PLUGINS
+      - UPTRACE_PROJECT_KEY1
+      - UPTRACE_PROJECT_KEY2
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/ssl/certs:/etc/ssl/certs:ro
+      - ./var/grafana:/var/lib/grafana
+      - ./etc/grafana.yml:/etc/grafana/provisioning/datasources/datasource.yml
+
+  mailpit:
+    image: axllent/mailpit:v1.16.0
+    hostname: mailpit
+    restart: always
+    ports:
+      - 8025:8025
+    labels:
+      - traefik.enable=true
+      - dcape.traefik.tag=${DCAPE_TAG}
+      - traefik.http.routers.${APP_TAG}-mail.rule=Host(`mail.${APP_SITE:?Must be set}`)
+      - traefik.http.routers.${APP_TAG}-mail.tls=${USE_TLS}
+      - traefik.http.routers.${APP_TAG}-mail.tls.certresolver=default
+      - traefik.http.services.${APP_TAG}-mail.loadbalancer.server.port=8025
+    environment:
+      MP_UI_AUTH: "${USER_EMAIL}:${USER_PASS}"
+      MP_SMTP_BIND_ADDR: 0.0.0.0:25
+      MP_MAX_MESSAGES: 5000
+      MP_DATA_FILE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_REQUIRE_TLS: 1
+      MP_SMTP_TLS_CERT: /config/ssl/mail.crt.pem
+      MP_SMTP_TLS_KEY: /config/ssl/mail.pk.pem
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./var/ssl:/config/ssl
+      - ./var/mailpit_data:/data

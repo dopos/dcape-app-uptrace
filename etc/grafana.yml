@@ -1,0 +1,34 @@
+apiVersion: 1
+
+# https://uptrace.dev/get/grafana.html#grafana-data-source
+
+datasources:
+  - name: Uptrace Tempo Project 1
+    type: tempo
+    access: proxy
+    url: http://app:14318/api/tempo/1
+    editable: true
+    jsonData:
+      httpHeaderName1: 'Authorization'
+    secureJsonData:
+      httpHeaderValue1: 'Bearer ${UPTRACE_PROJECT_KEY1}'
+
+  - name: Uptrace Prometheus Project 1
+    type: prometheus
+    access: proxy
+    url: http://app:14318/api/prometheus/1
+    editable: true
+    jsonData:
+      httpHeaderName1: 'Authorization'
+    secureJsonData:
+      httpHeaderValue1: 'Bearer ${UPTRACE_PROJECT_KEY1}'
+
+  - name: My project
+    type: prometheus
+    access: proxy
+    url: http://app:14318/api/prometheus/2
+    editable: true
+    jsonData:
+      httpHeaderName1: 'Authorization'
+    secureJsonData:
+      httpHeaderValue1: 'Bearer ${UPTRACE_PROJECT_KEY2}'

@@ -1,19 +1,19 @@
-# dcape-app-template
+# dcape-app-uptrace
 
 [![GitHub Release][1]][2] [![GitHub code size in bytes][3]]() [![GitHub license][4]][5]
 
-[1]: https://img.shields.io/github/release/dopos/dcape-app-template.svg
-[2]: https://github.com/dopos/dcape-app-template/releases
-[3]: https://img.shields.io/github/languages/code-size/dopos/dcape-app-template.svg
-[4]: https://img.shields.io/github/license/dopos/dcape-app-template.svg
+[1]: https://img.shields.io/github/release/dopos/dcape-app-uptrace.svg
+[2]: https://github.com/dopos/dcape-app-uptrace/releases
+[3]: https://img.shields.io/github/languages/code-size/dopos/dcape-app-uptrace.svg
+[4]: https://img.shields.io/github/license/dopos/dcape-app-uptrace.svg
 [5]: LICENSE
 
-[upstream_name](https://upstream_url) application package for [dcape](https://github.com/dopos/dcape).
+[Uptrace](https://uptrace.dev/) application package for [dcape](https://github.com/dopos/dcape).
 
 ## Upstream
 
-* Project: [upstream_name](https://upstream_url)
-* Docker: [template](https://hub.docker.com/r/template)
+* Project: [Uptrace](https://uptrace.dev/)
+* Docker: [uptrace](https://hub.docker.com/r/uptrace/uptrace)
 
 ## Requirements
 
@@ -22,6 +22,10 @@
 * [dcape](https://github.com/dopos/dcape) v3
 * VCS service like [Gitea](https://gitea.io)
 * CI/CD service like [Woodpecker CI](https://woodpecker-ci.org/)
+
+## See also
+
+* https://github.com/uptrace/uptrace/tree/master/example/docker
 
 ## Install
 
@@ -38,8 +42,8 @@
 
 Run commands on deploy host with [dcape](https://github.com/dopos/dcape) installed:
 ```bash
-git clone https://github.com/dopos/dcape-app-template.git
-cd dcape-app-template
+git clone https://github.com/dopos/dcape-app-uptrace.git
+cd dcape-app-uptrace
 make config-if
 ... <edit .env>
 make up
