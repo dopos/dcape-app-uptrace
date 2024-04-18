@@ -7,7 +7,18 @@ CFG                ?= .env
 CFG_BAK            ?= $(CFG).bak
 
 #- App name
-APP_NAME           ?= uptrace
+APP_NAME           ?= ut
+
+#- Site GRPC host
+GRPC_SITE          ?= $(APP_NAME)g.$(DCAPE_DOMAIN)
+#- OT collector host
+OTC_SITE           ?= $(APP_NAME)otc.$(DCAPE_DOMAIN)
+#- OT collector GRPC host
+OTC_GRPC_SITE      ?= $(APP_NAME)otcg.$(DCAPE_DOMAIN)
+#- MailPit host
+MAIL_SITE          ?= $(APP_NAME)mail.$(DCAPE_DOMAIN)
+#- Grafana host
+GRAF_SITE          ?= $(APP_NAME)graf.$(DCAPE_DOMAIN)
 
 #- Docker image name
 IMAGE              ?= uptrace/uptrace

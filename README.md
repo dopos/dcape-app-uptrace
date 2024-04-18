@@ -15,6 +15,33 @@
 * Project: [Uptrace](https://uptrace.dev/)
 * Docker: [uptrace](https://hub.docker.com/r/uptrace/uptrace)
 
+## Состав
+
+* [uptrace](https://uptrace.dev/) - фронтенд трейсов и метрик
+* [otelcol](https://github.com/open-telemetry/opentelemetry-collector-contrib) - коллектор трейсов и метрик
+* [mailpit](https://mailpit.axllent.org/) - фронтенд почтовых алертов
+* clickhouse - хранение метрик и трейсов
+* postgresql (в составе dcape) - служебные данные uptrace
+* grafana
+
+## FQDN
+
+Для домена `dev.test` дефолтные FQDN сервисов имеют вид:
+
+* `ut.dev.test` - WWW фронт uptrace
+* `utg.dev.test` - GRPC фронт uptrace
+* `utotc.dev.test` - prometheus фронт otel-collector
+* `utotcg.dev.test` - GRPC фронт otel-collector
+* `utmail.dev.test` - WWW фронт mailpit
+* `utgraf.dev.test` - WWW фронт grafana
+
+## Архитектура решения
+
+1. логи и метрики отправляются на заданный эндпоинт otel-collector
+2. коллектор получает данные от приложений и своих агентов и отправляет все в uptrace
+3. uptrace предоставляет интерфейс к трейсам, логам, метрикам
+4. grafana использует метрики utrace в качестве источника данных
+
 ## Requirements
 
 * linux 64bit with git, make, sed installed

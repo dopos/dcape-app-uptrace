@@ -61,7 +61,7 @@ processors:
 
 exporters:
   otlp/uptrace:
-    endpoint: https://grpc.${env:APP_SITE}:443
+    endpoint: https://${env:GRPC_SITE}:443
     tls:
       insecure: true
     headers: { 'uptrace-dsn': 'https://${env:UPTRACE_PROJECT_KEY2}@${env:APP_SITE}?grpc=14317' }

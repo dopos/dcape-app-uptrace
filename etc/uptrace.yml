@@ -82,7 +82,8 @@ auth:
       email: ${USER_EMAIL}
       password: ${USER_PASS}
       notify_by_email: true
-
+      # Register key for API auth
+      auth_token: ${UPTRACE_PROJECT_KEY1}
 ##
 ## Various options to tweak ClickHouse schema.
 ## For changes to take effect, you need reset the ClickHouse database with `ch reset`.
@@ -164,7 +165,7 @@ metrics:
 uptrace_go:
   # Enabled by default.
   #disabled: true
-  dsn: 'http://${UPTRACE_PROJECT_KEY1}@grpc.${APP_SITE}:443?grpc=443'
+  dsn: 'http://${UPTRACE_PROJECT_KEY1}@${GRPC_SITE}:443?grpc=443'
 
   tls:
     insecure_skip_verify: true

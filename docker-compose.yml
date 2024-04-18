@@ -9,13 +9,14 @@ services:
       - traefik.http.routers.${APP_TAG}.service=${APP_TAG}
 
       - traefik.http.routers.${APP_TAG}-grpc.service=${APP_TAG}-grpc
-      - traefik.http.routers.${APP_TAG}-grpc.rule=Host(`grpc.${APP_SITE:?Must be set}`)
+      - traefik.http.routers.${APP_TAG}-grpc.rule=Host(`${GRPC_SITE}`)
       - traefik.http.routers.${APP_TAG}-grpc.tls=${USE_TLS}
       - traefik.http.routers.${APP_TAG}-grpc.tls.certresolver=default
       - traefik.http.services.${APP_TAG}-grpc.loadbalancer.server.port=14317
       - traefik.http.services.${APP_TAG}-grpc.loadbalancer.server.scheme=h2c
     environment:
       - APP_SITE
+      - GRPC_SITE
       - USER_EMAIL
       - USER_PASS
       - PGDATABASE
@@ -38,9 +39,6 @@ services:
   ch_db:
     image: clickhouse/clickhouse-server:23.7-alpine
     restart: always
-#    ports:
-#      - '8123:8123'
-#      - '9000:9000'
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -66,13 +64,13 @@ services:
     labels:
       - traefik.enable=true
       - dcape.traefik.tag=${DCAPE_TAG}
-      - traefik.http.routers.${APP_TAG}-otc.rule=Host(`otc.${APP_SITE:?Must be set}`)
+      - traefik.http.routers.${APP_TAG}-otc.rule=Host(`${OTC_SITE}`)
       - traefik.http.routers.${APP_TAG}-otc.tls=${USE_TLS}
       - traefik.http.routers.${APP_TAG}-otc.tls.certresolver=default
       - traefik.http.routers.${APP_TAG}-otc.service=${APP_TAG}-otc
       - traefik.http.services.${APP_TAG}-otc.loadbalancer.server.port=4318
 
-      - traefik.http.routers.${APP_TAG}-grpcotc.rule=Host(`grpc.otc.${APP_SITE:?Must be set}`)
+      - traefik.http.routers.${APP_TAG}-grpcotc.rule=Host(`${OTC_GRPC_SITE}`)
       - traefik.http.routers.${APP_TAG}-grpcotc.tls=${USE_TLS}
       - traefik.http.routers.${APP_TAG}-grpcotc.tls.certresolver=default
       - traefik.http.routers.${APP_TAG}-grpcotc.service=${APP_TAG}-grpcotc
@@ -80,6 +78,7 @@ services:
       - traefik.http.services.${APP_TAG}-grpcotc.loadbalancer.server.scheme=h2c
     environment:
       - APP_SITE
+      - GRPC_SITE
       - PGDATABASE
       - PGUSER
       - PGPASSWORD
@@ -89,7 +88,6 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /etc/ssl/certs:/etc/ssl/certs:ro
 #      - /:/hostfs:ro
-#      - ./var/ssl/ca.crt.pem:/etc/ssl/certs/ca-certificates.crt
       - ./etc/otel-collector.yaml:/etc/otelcol-contrib/config.yaml
 
   grafana:
@@ -98,7 +96,7 @@ services:
     labels:
       - traefik.enable=true
       - dcape.traefik.tag=${DCAPE_TAG}
-      - traefik.http.routers.${APP_TAG}-graf.rule=Host(`graf.${APP_SITE:?Must be set}`)
+      - traefik.http.routers.${APP_TAG}-graf.rule=Host(`${GRAF_SITE}`)
       - traefik.http.routers.${APP_TAG}-graf.tls=${USE_TLS}
       - traefik.http.routers.${APP_TAG}-graf.tls.certresolver=default
       - traefik.http.services.${APP_TAG}-graf.loadbalancer.server.port=3000
@@ -122,7 +120,7 @@ services:
     labels:
       - traefik.enable=true
       - dcape.traefik.tag=${DCAPE_TAG}
-      - traefik.http.routers.${APP_TAG}-mail.rule=Host(`mail.${APP_SITE:?Must be set}`)
+      - traefik.http.routers.${APP_TAG}-mail.rule=Host(`${MAIL_SITE}`)
       - traefik.http.routers.${APP_TAG}-mail.tls=${USE_TLS}
       - traefik.http.routers.${APP_TAG}-mail.tls.certresolver=default
       - traefik.http.services.${APP_TAG}-mail.loadbalancer.server.port=8025

@@ -31,4 +31,4 @@ datasources:
     jsonData:
       httpHeaderName1: 'Authorization'
     secureJsonData:
-      httpHeaderValue1: 'Bearer ${UPTRACE_PROJECT_KEY2}'
+      httpHeaderValue1: 'Bearer ${UPTRACE_PROJECT_KEY1}'
