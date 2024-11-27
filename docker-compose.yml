@@ -37,7 +37,7 @@ services:
       - mailpit
 
   ch_db:
-    image: clickhouse/clickhouse-server:23.7-alpine
+    image: clickhouse/clickhouse-server:${CLIHO_VER}
     restart: always
     volumes:
       - /etc/timezone:/etc/timezone:ro
@@ -61,7 +61,7 @@ services:
         hard: 262144
 
   otelcol:
-    image: otel/opentelemetry-collector-contrib:0.88.0
+    image: otel/opentelemetry-collector-contrib:${OTELCOL_VER}
     restart: on-failure
     labels:
       - traefik.enable=true

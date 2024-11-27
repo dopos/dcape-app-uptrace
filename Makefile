@@ -42,6 +42,12 @@ GF_IMAGE_VER       ?= 10.3.1
 #- Grafana plugins
 GF_INSTALL_PLUGINS ?=
 
+#- ClickHouse docker image tag
+CLIHO_VER           ?= 23.7-alpine
+
+#- Opentelemetry collector docker image tag
+OTELCOL_VER         ?= 0.88.0
+
 # If you need database, uncomment this var
 USE_DB              = yes
 
