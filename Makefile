@@ -24,7 +24,7 @@ GRAF_SITE          ?= $(APP_NAME)graf.$(DCAPE_DOMAIN)
 IMAGE              ?= uptrace/uptrace
 
 #- Docker image tag
-IMAGE_VER          ?= 1.7.1
+IMAGE_VER          ?= 1.7.7
 
 #- Uptrace project 1 key
 UPTRACE_PROJECT_KEY1 ?= $(shell openssl rand -hex 16; echo)
@@ -43,7 +43,7 @@ GF_IMAGE_VER       ?= 10.3.1
 GF_INSTALL_PLUGINS ?=
 
 #- ClickHouse docker image tag
-CLIHO_VER           ?= 23.7-alpine
+CLIHO_VER           ?= 24.7-alpine
 
 #- Opentelemetry collector docker image tag
 OTELCOL_VER         ?= 0.88.0
