@@ -62,7 +62,7 @@ services:
 
   otelcol:
     image: otel/opentelemetry-collector-contrib:${OTELCOL_VER}
-    restart: on-failure
+    restart: always
     labels:
       - traefik.enable=true
       - dcape.traefik.tag=${DCAPE_TAG}
