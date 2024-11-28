@@ -37,16 +37,16 @@ UPTRACE_SECRET_KEY   ?= $(shell openssl rand -hex 16; echo)
 GF_IMAGE           ?= grafana/grafana
 
 #- Grafana docker image tag
-GF_IMAGE_VER       ?= 10.3.1
+GF_IMAGE_VER       ?= 11.3.1
 
 #- Grafana plugins
 GF_INSTALL_PLUGINS ?=
 
 #- ClickHouse docker image tag
-CLIHO_VER           ?= 24.7-alpine
+CLIHO_VER           ?= 24.9.3
 
 #- Opentelemetry collector docker image tag
-OTELCOL_VER         ?= 0.88.0
+OTELCOL_VER         ?= 0.114.0
 
 # If you need database, uncomment this var
 USE_DB              = yes
